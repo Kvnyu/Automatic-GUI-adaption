@@ -6,8 +6,9 @@ from  apk_crawler import store_path
 
 spacer = '     |||     '
 
+tv_corresponding_app_path = './tv_corresponding_apps.txt'
 tv_dic = open('./tv_dic.txt', encoding='gbk').readlines()
-tv_corresponding_apps = open('./tv_corresponding_apps.txt', 'a+', encoding='gbk')
+tv_corresponding_apps = open(tv_corresponding_app_path, 'a+', encoding='gbk')
 
 def download(file_path):
     # returns JSON object as

@@ -1,5 +1,8 @@
 import os
 import difflib
+import shutil
+
+target_dir = './high_similarity_apps'
 tv_corresponding_apps_path = 'tv_corresponding_apps.txt'
 spacer = '     |||     '
 cmd_instructions = []
@@ -25,7 +28,10 @@ def check_tv_dic(path):
         similarity = difflib.SequenceMatcher(None, tv_name, an_name).quick_ratio()
         if similarity > 0.9:
             #print(line[0]+" "+line[1])
-            paths.append(path)
+            if not path in paths:
+                paths.append(path)
+            else:
+                print('path:'+path+'have been in paths')
 
     return paths
 
@@ -41,8 +47,14 @@ def cmd_evoker(path):
             cmd = "".join(cmd_instructions)
             os.system(cmd)
 
+def move_file(path):
+    dir = path[path.rindex('/'):]
+    shutil.copytree(path, target_dir+dir)
+
 if __name__ == '__main__':
     paths = check_tv_dic(tv_corresponding_apps_path)
+    print(len(paths))
     for path in paths:
         print(path[:-1])
-        cmd_evoker(path[:-1])
+        move_file(path[:-1])
+        #cmd_evoker(path[:-1])

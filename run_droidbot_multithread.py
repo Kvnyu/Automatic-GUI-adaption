@@ -39,8 +39,14 @@ def cmd_evoker(input_path, output_path, emulator):
     for root, dirs, files in os.walk(input_path, topdown=True):
         for file_path in files:
             cmd_instructions = []
-            cmd_instructions.append('timeout 1800 droidbot -keep_env -is_emulator ')
+            cmd_instructions.append('droidbot ')
+            cmd_instructions.append('-is_emulator ')
             cmd_instructions.append('-d ' + emulator + ' ')
+            cmd_instructions.append('-keep_env ')
+            cmd_instructions.append('-grant_perm ')
+            cmd_instructions.append('-ignore_ad ')
+            cmd_instructions.append('-timeout 600 ')
+            cmd_instructions.append('-policy bfs_greedy ')
             apk_path = os.path.join(root, file_path)
             print(apk_path)
             cmd_instructions.append('-a '+apk_path+' ')

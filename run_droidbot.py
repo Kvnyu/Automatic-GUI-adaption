@@ -1,14 +1,20 @@
 import os
 
-h_apps_dir = 'high_similarity_apps'
-save_dir = 'results'
-cmd_instructions = []
-cmd_instructions.append('droidbot -keep_env -is_emulator ')
-#cmd_instructions.append('-timeout 300 ')
+#apks/category/app name directory/andorid.apk + tv.apk. Example: test_apks/video_player/Youtube/youtube.apk + tv_youtube.tv
+h_apps_dir = 'test_apks'
+save_dir = 'test_results'
 
 def cmd_evoker(path):
     for root, dirs, files in os.walk(path, topdown=True):
         for file_path in files:
+            cmd_instructions = []
+            cmd_instructions.append('droidbot ')
+            #cmd_instructions.append('-is_emulator ')
+            cmd_instructions.append('-keep_env ')
+            cmd_instructions.append('-grant_perm ')
+            cmd_instructions.append('-ignore_ad ')
+            cmd_instructions.append('-timeout 600 ')
+            cmd_instructions.append('-policy bfs_greedy ')
             apk_path = os.path.join(root, file_path)
             print(apk_path)
             cmd_instructions.append('-a '+apk_path+' ')

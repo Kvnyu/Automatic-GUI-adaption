@@ -30,18 +30,38 @@ def parse_droidbot_json(json_file_path):
             fig = plt.figure(figsize=(15, 10))
         ax1 = fig.add_subplot(1, 1, 1)
         ax1.xaxis.set_ticks_position('top')  # put x axis on the top
-        plt.axis([x_min, x_max, y_min, y_max])
 
+        plt.axis([x_min, x_max, y_max, y_min])
+
+        current_color = 'red'
+        status_zero = True
         for view in views:
             text = view['text']
             if text != None:
                 texts.append(text)
 
+            size = view['size'].split('*')
+            size_1 = int(size[0])
+            size_2 = int(size[1])
+            if not status_zero:
+                if size_1 >= x_max or size_1 >= y_max:
+                    if current_color == 'red':
+                        current_color = 'blue'
+                    else:
+                        current_color = 'red'
+                if size_2 >= x_max or size_2 >= y_max:
+                    if current_color == 'red':
+                        current_color = 'blue'
+                    else:
+                        current_color = 'red'
+
             class_type = view['class']
-            # if 'View' not in class_type:
-            #     continue
+            if 'View' not in class_type:
+                continue
             if 'Layout' in class_type:
                 continue
+
+
             bounds = view['bounds']
             bounds_all.append(view['bounds'])
             ax1.add_patch(plt.Rectangle(
@@ -49,11 +69,11 @@ def parse_droidbot_json(json_file_path):
                 bounds[1][0] - bounds[0][0],
                 bounds[1][1] - bounds[0][1],
                 fill=False,
-                edgecolor='red'
+                edgecolor=current_color
             ))
+            status_zero = False
 
     #plt.show()
-
     plt.savefig(json_file_path+'.png')
     fig.canvas.flush_events()
     plt.close()
@@ -114,11 +134,11 @@ def copy_snapshot_json(name, dst, dir):
     for root, dirs, files in os.walk(dir, topdown=False):
         for file in files:
             if name in file:
-                print('copy file'+file)
+                #print('copy file'+file)
                 shutil.copy(os.path.join(dir, file), os.path.join(dst, file))
 
 def traverse_snopshot(an_dir, tv_dir, root_dir):
-    print('traverse... ')
+    print('traverse: '+root_dir)
     an_json_files = []
     tv_json_files = []
     for root, dirs, files in os.walk(an_dir):
@@ -146,11 +166,39 @@ def check_main_activity(activity_name):
             return True
     return False
 
+def split_views():
+    print()
+
+def traverse_all_dataset(path):
+    for root, dirs, files in os.walk(path):
+        for dir in dirs:
+            if check_an_tv_result(os.path.join(root, dir)):
+                #print('valid')
+                an_states = os.path.join(root, dir, dir+'.apk', 'states')
+                tv_states = os.path.join(root, dir, 'tv_'+dir+'.apk', 'states')
+                traverse_snopshot(an_states, tv_states, os.path.join(root, dir))
+            else:
+                continue
+
+def check_an_tv_result(path):
+    status = False
+    count = 0
+    keyword = 'events'
+    for root, dirs, files in os.walk(path):
+        for dir in dirs:
+            full_dir = os.path.join(root, dir)
+            for root2, dirs2, files2 in os.walk(full_dir):
+                if keyword in dirs2:
+                        count += 1
+                        break
+
+    if count >= 2:
+        status = True
+    return status
 
 if __name__=='__main__':
-
     #json_path = 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\state_2020-11-16_103409.json'
-
+    #json_path = 'results\\apks\\1\\aqiyi\iqiyi_20236.apk\state_2020-11-16_102435.json'
     #tv_bounds, tv_texts, _ = parse_droidbot_json(json_path)
     # _, android_texts = parse_droidbot_json(android_json_file_path)
     # print(check_similarity(tv_texts, android_texts))
@@ -158,4 +206,6 @@ if __name__=='__main__':
     # find_corresponding_snapshot(android_json_file_path, tv_json_file_path, 'results\\apks\\1\\aqiyi',
     #                             'results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states')
 
-    traverse_snopshot('results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states', 'results\\apks\\1\\aqiyi')
+    #traverse_snopshot('results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states', 'results\\apks\\1\\aqiyi')
+
+    traverse_all_dataset('results\high_similarity_apps')

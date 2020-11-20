@@ -5,7 +5,7 @@ import difflib
 from  apk_crawler import store_path
 
 spacer = '     |||     '
-
+min_apk_size = 100*1024
 tv_corresponding_app_path = './tv_corresponding_apps.txt'
 tv_dic = open('./tv_dic.txt', encoding='gbk').readlines()
 tv_corresponding_apps = open(tv_corresponding_app_path, 'a+', encoding='gbk')
@@ -25,29 +25,12 @@ def download(file_path):
 
         tv_app = check_tv_dic(apk_name, tv_dic)
 
-        #gbk can not convert '\xa0'
-        # apk_name = apk_name.replace(u'\xa0', u' ')
-        # apk_name = apk_name.replace(u'\u0643', u' ')
-        # apk_name = apk_name.replace(u'\u06c6', u' ')
-        # apk_name = apk_name.replace(u'\u0631', u' ')
-        # apk_name = apk_name.replace(u'\u2122', u' ')
-        # apk_name = apk_name.replace(u'\u200b', u' ')
-        # apk_name = apk_name.replace(u'\u2022', u' ')
-        # apk_name = apk_name.replace(u'\ufeff', u' ')
         apk_name = apk_name.encode('gbk', 'ignore').decode('gbk')
 
         if tv_app == 0:
             print(apk_name+": no corresponding tv app")
             continue
         else:
-            # tv_app = tv_app.replace(u'\xa0', u' ')
-            # tv_app = tv_app.replace(u'\u0643', u' ')
-            # tv_app = tv_app.replace(u'\u06c6', u' ')
-            # tv_app = tv_app.replace(u'\u0631', u' ')
-            # tv_app = tv_app.replace(u'\u2122', u' ')
-            # tv_app = tv_app.replace(u'\u200b', u' ')
-            # tv_app = tv_app.replace(u'\u2022', u' ')
-            # tv_app = tv_app.replace(u'\ufeff', u' ')
             tv_app = tv_app.encode('gbk', 'ignore').decode('gbk')
             print('find corresponding tv app:' + tv_app + " and "+ apk_name)
 
@@ -63,13 +46,13 @@ def download(file_path):
 
         if os.path.exists(apk_path):
             fsize = os.path.getsize(apk_path)
-            if fsize > 0:
+            if fsize > min_apk_size:
                 print('apk has downloaded: '+apk_path)
                 count += 1
                 print(str(len(data)) + '/' + str(count))
                 continue
             else:
-                print('0 kb apk, delete '+apk_path)
+                print('less than 100 kb apk, delete '+apk_path)
                 os.remove(apk_path)
         try:
             with open(apk_path, 'wb') as file:

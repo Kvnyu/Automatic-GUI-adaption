@@ -2,20 +2,13 @@ import json
 import matplotlib.pyplot as plt
 import os
 import shutil
-
-tv_json_file_path = 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states\state_2020-11-16_103235.json'
-android_json_file_path = 'results\\apks\\1\\aqiyi\iqiyi_20236.apk\states\state_2020-11-16_102502.json'
+from matplotlib.pyplot import MultipleLocator
 
 def parse_droidbot_json(json_file_path):
-    print('parse begin...')
-    bounds = []
+    #print('parse begin...')
+    bounds_all = []
     texts = []
-    fig = plt.figure('Andoird app layout', dpi=500)
-    ax1 = fig.add_subplot(1,1,1)
-
-    ax1.xaxis.set_ticks_position('top')  # put x axis on the top
-    #ax1.invert_xaxis()  # invert x axis
-    #ax1.invert_yaxis()
+    is_main_activity = False
 
     with open(json_file_path, 'r', encoding='utf8') as f:
         data = json.load(f)
@@ -23,8 +16,21 @@ def parse_droidbot_json(json_file_path):
         views = data['views']
         tag = data['tag']
         state_str = data['state_str']
-        plt.xlim(views[0]['bounds'][0][0], views[0]['bounds'][1][0])
-        plt.ylim(views[0]['bounds'][1][1], views[0]['bounds'][0][1])
+        foreground_activity = data['foreground_activity']
+        is_main_activity = check_main_activity(foreground_activity)
+
+        x_min = views[0]['bounds'][0][0]
+        x_max = views[0]['bounds'][1][0]
+        y_min = views[0]['bounds'][0][1]
+        y_max = views[0]['bounds'][1][1]
+
+        if y_max > x_max:
+            fig = plt.figure(figsize=(10, 15))
+        else:
+            fig = plt.figure(figsize=(15, 10))
+        ax1 = fig.add_subplot(1, 1, 1)
+        ax1.xaxis.set_ticks_position('top')  # put x axis on the top
+        plt.axis([x_min, x_max, y_min, y_max])
 
         for view in views:
             text = view['text']
@@ -37,7 +43,7 @@ def parse_droidbot_json(json_file_path):
             if 'Layout' in class_type:
                 continue
             bounds = view['bounds']
-            bounds.append(view['bounds'])
+            bounds_all.append(view['bounds'])
             ax1.add_patch(plt.Rectangle(
                 bounds[0],
                 bounds[1][0] - bounds[0][0],
@@ -47,8 +53,11 @@ def parse_droidbot_json(json_file_path):
             ))
 
     #plt.show()
+
     plt.savefig(json_file_path+'.png')
-    return bounds, texts
+    fig.canvas.flush_events()
+    plt.close()
+    return bounds_all, texts, is_main_activity
 
 
 def draw_rectangle(bounds):
@@ -68,45 +77,85 @@ def check_similarity(texts1, texts2):
         for text2 in texts2:
             if text2 in texts1:
                 count += 1
-    print(count)
     if count * 5 > min_len:
+        print('the same texts: ' + str(count))
         return True
     else:
         return False
 
 
 def find_corresponding_snapshot(android_json_path, tv_json_path, root_dir, an_dir, tv_dir):
-    tv_bounds, tv_texts = parse_droidbot_json(tv_json_path)
-    android_bounds, android_texts = parse_droidbot_json(android_json_path)
-    status = check_similarity(tv_texts, android_texts)
-    if status == True:
-        copy_file(android_json_path, tv_json_path, root_dir, an_dir, tv_dir)
-    else:
-        return False
+    tv_bounds, tv_texts, an_is_main = parse_droidbot_json(tv_json_path)
+    android_bounds, android_texts, tv_is_main = parse_droidbot_json(android_json_path)
 
-def copy_file(android_json_path, tv_json_path, root_dir, an_dir, tv_dir):
     an_name = ((android_json_path.split('\\')[-1]).split('.')[0])[6:]
     tv_name = ((tv_json_path.split('\\')[-1]).split('.')[0])[6:]
 
-    coresponding_snapshots_dir = os.path.join(root_dir, 'coresponding_snapshots_dir', an_name)
-    if not os.path.exists(coresponding_snapshots_dir):
-        os.makedirs(coresponding_snapshots_dir)
+    if an_is_main:
+        dst = os.path.join(root_dir, 'main_activity', 'android')
+        copy_snapshot_json(an_name, dst, an_dir)
+    if tv_is_main:
+        dst = os.path.join(root_dir, 'main_activity', 'tv')
+        copy_snapshot_json(tv_name, dst, tv_dir)
 
-    for root, dirs, files in os.walk(an_dir, topdown=False):
-        for file in files:
-            if an_name in file:
-                shutil.copy(os.path.join(an_dir, file), os.path.join(coresponding_snapshots_dir, file))
+    status = check_similarity(tv_texts, android_texts)
+    if status == True:
+        #copy_file(android_json_path, tv_json_path, root_dir, an_dir, tv_dir)
+        dst = os.path.join(root_dir, 'coresponding_snapshots_dir', an_name + '+' +tv_name)
+        copy_snapshot_json(an_name, dst, an_dir)
+        copy_snapshot_json(tv_name, dst, tv_dir)
+    else:
+        return False
 
-    for root, dirs, files in os.walk(tv_dir, topdown=False):
+def copy_snapshot_json(name, dst, dir):
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+
+    for root, dirs, files in os.walk(dir, topdown=False):
         for file in files:
-            if tv_name in file:
-                shutil.copy(os.path.join(tv_dir, file), os.path.join(coresponding_snapshots_dir, file))
+            if name in file:
+                print('copy file'+file)
+                shutil.copy(os.path.join(dir, file), os.path.join(dst, file))
+
+def traverse_snopshot(an_dir, tv_dir, root_dir):
+    print('traverse... ')
+    an_json_files = []
+    tv_json_files = []
+    for root, dirs, files in os.walk(an_dir):
+        for file in files:
+            suffix = file.split('.')[-1]
+            if suffix == 'json':
+                an_json_files.append(os.path.join(root, file))
+
+    for root, dirs, files in os.walk(tv_dir):
+        for file in files:
+            suffix = file.split('.')[-1]
+            if suffix == 'json':
+                tv_json_files.append(os.path.join(root, file))
+
+    #print(len(an_json_files))
+
+    for tv_json_file in tv_json_files:
+        for an_json_file in an_json_files:
+            find_corresponding_snapshot(an_json_file, tv_json_file, root_dir, an_dir, tv_dir)
+
+def check_main_activity(activity_name):
+    dic = ['home', 'Home', 'Main', 'main', 'Welcome', 'welcome']
+    for word in dic:
+        if word in activity_name:
+            return True
+    return False
 
 
 if __name__=='__main__':
-    # tv_bounds, tv_texts = parse_droidbot_json(tv_json_file_path)
+
+    #json_path = 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\state_2020-11-16_103409.json'
+
+    #tv_bounds, tv_texts, _ = parse_droidbot_json(json_path)
     # _, android_texts = parse_droidbot_json(android_json_file_path)
     # print(check_similarity(tv_texts, android_texts))
 
-    find_corresponding_snapshot(android_json_file_path, tv_json_file_path, 'results\\apks\\1\\aqiyi',
-                                'results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states')
+    # find_corresponding_snapshot(android_json_file_path, tv_json_file_path, 'results\\apks\\1\\aqiyi',
+    #                             'results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states')
+
+    traverse_snopshot('results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states', 'results\\apks\\1\\aqiyi')

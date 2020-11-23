@@ -8,6 +8,8 @@ def check_results(result_path, apk_path):
             full_dir = os.path.join(root, dir)
             for root2, dirs2, files2 in os.walk(full_dir):
                 for dir2 in dirs2:
+                    if dir2 == 'coresponding_snapshots_dir' or dir2 == 'main_activity':
+                        continue
                     is_success = False
                     full_dir2 = os.path.join(root2, dir2)
                     for root3, dirs3, files3 in os.walk(full_dir2):

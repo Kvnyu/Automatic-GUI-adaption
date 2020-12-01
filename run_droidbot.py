@@ -1,8 +1,8 @@
 import os
 
 #apks/category/app name directory/andorid.apk + tv.apk. Example: test_apks/video_player/Youtube/youtube.apk + tv_youtube.tv
-h_apps_dir = 'high_similarity_apps'
-save_dir = 'results'
+h_apps_dir = 'test_apks'
+save_dir = 'test_results'
 
 def cmd_evoker(path):
     for root, dirs, files in os.walk(path, topdown=True):
@@ -13,7 +13,7 @@ def cmd_evoker(path):
             cmd_instructions.append('-keep_env ')
             cmd_instructions.append('-grant_perm ')
             cmd_instructions.append('-ignore_ad ')
-            cmd_instructions.append('-timeout 600 ')
+            cmd_instructions.append('-timeout 1200 ')
             cmd_instructions.append('-policy bfs_greedy ')
             apk_path = os.path.join(root, file_path)
             print(apk_path)

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import shutil
 from matplotlib.pyplot import MultipleLocator
+from collect_snapshots import copy_snapshot_json, check_main_activity, check_an_tv_result
 
 def parse_droidbot_json(json_file_path):
     #print('parse begin...')
@@ -56,11 +57,13 @@ def parse_droidbot_json(json_file_path):
                         current_color = 'red'
 
             class_type = view['class']
+
+            if class_type == None:
+                continue
             if 'View' not in class_type:
                 continue
             if 'Layout' in class_type:
                 continue
-
 
             bounds = view['bounds']
             bounds_all.append(view['bounds'])
@@ -79,9 +82,6 @@ def parse_droidbot_json(json_file_path):
     plt.close()
     return bounds_all, texts, is_main_activity
 
-
-def draw_rectangle(bounds):
-    print(bounds)
 
 def check_similarity(texts1, texts2):
     count = 0
@@ -102,7 +102,6 @@ def check_similarity(texts1, texts2):
         return True
     else:
         return False
-
 
 def find_corresponding_snapshot(android_json_path, tv_json_path, root_dir, an_dir, tv_dir):
     tv_bounds, tv_texts, an_is_main = parse_droidbot_json(tv_json_path)
@@ -127,16 +126,6 @@ def find_corresponding_snapshot(android_json_path, tv_json_path, root_dir, an_di
     else:
         return False
 
-def copy_snapshot_json(name, dst, dir):
-    if not os.path.exists(dst):
-        os.makedirs(dst)
-
-    for root, dirs, files in os.walk(dir, topdown=False):
-        for file in files:
-            if name in file:
-                #print('copy file'+file)
-                shutil.copy(os.path.join(dir, file), os.path.join(dst, file))
-
 def traverse_snopshot(an_dir, tv_dir, root_dir):
     print('traverse: '+root_dir)
     an_json_files = []
@@ -159,12 +148,6 @@ def traverse_snopshot(an_dir, tv_dir, root_dir):
         for an_json_file in an_json_files:
             find_corresponding_snapshot(an_json_file, tv_json_file, root_dir, an_dir, tv_dir)
 
-def check_main_activity(activity_name):
-    dic = ['home', 'Home', 'Main', 'main', 'Welcome', 'welcome']
-    for word in dic:
-        if word in activity_name:
-            return True
-    return False
 
 def split_views():
     print()
@@ -180,21 +163,7 @@ def traverse_all_dataset(path):
             else:
                 continue
 
-def check_an_tv_result(path):
-    status = False
-    count = 0
-    keyword = 'events'
-    for root, dirs, files in os.walk(path):
-        for dir in dirs:
-            full_dir = os.path.join(root, dir)
-            for root2, dirs2, files2 in os.walk(full_dir):
-                if keyword in dirs2:
-                        count += 1
-                        break
 
-    if count >= 2:
-        status = True
-    return status
 
 if __name__=='__main__':
     #json_path = 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\state_2020-11-16_103409.json'
@@ -208,4 +177,8 @@ if __name__=='__main__':
 
     #traverse_snopshot('results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states', 'results\\apks\\1\\aqiyi')
 
-    traverse_all_dataset('results\high_similarity_apps')
+    traverse_all_dataset('results\selected_apps\\1')
+    traverse_all_dataset('results\selected_apps\\2')
+    traverse_all_dataset('results\selected_apps\\3')
+
+    #traverse_all_dataset('selected_apps')

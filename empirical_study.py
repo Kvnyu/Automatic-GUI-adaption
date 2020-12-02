@@ -1,48 +1,19 @@
 import os
 import json
 spacer = '     |||     '
-results_dir = 'results\empirical_study'
-import numpy as np
+results_dir = 'results\empirical_study\\Layout'
 
 
-def collect_views(json_file_path, results_file_path):
-    with open(json_file_path, 'r', encoding='utf8') as f, open(results_file_path, 'a', encoding='utf-8') as result_f:
-        data = json.load(f)
-        # print(data['views'].decode('utf-8'))
-        views = data['views']
-        tag = data['tag']
-        state_str = data['state_str']
-        foreground_activity = data['foreground_activity']
-        lines = set()
-        for view in views:
-            size = view['size']
-            class_type = view['class']
-            bounds = view ['bounds']
-
-            if class_type == None:
-                continue
-            if 'View' not in class_type:
-                continue
-            if 'Layout' in class_type:
-                continue
-            bounds = view['bounds']
-
-            line = class_type + spacer + size + spacer + str(bounds) + '\n'
-            lines.add(line)
-
-        for s in lines:
-            result_f.write(s)
-
-
-def analyze_views(results_dir):
+def analyze_GUIs(results_dir):
     android_results_path = os.path.join(results_dir, 'android')
     tv_results_path = os.path.join(results_dir, 'tv')
 
-    an_save_path = os.path.join(results_dir, 'an_frequency_count.txt')
+    an_save_path = os.path.join(results_dir, 'android_frequency_count.txt')
     frequency_count(android_results_path, an_save_path)
 
     tv_save_path = os.path.join(results_dir, 'tv_frequency_count.txt')
     frequency_count(tv_results_path, tv_save_path)
+
 
 def frequency_count(path, save_path):
     dict = {}
@@ -60,6 +31,7 @@ def frequency_count(path, save_path):
 
     save_dict(dict, save_path)
 
+
 def save_dict(dict, save_path):
     dict = sorted(dict.items(), key=lambda d: d[1], reverse=True)
     sum = 0
@@ -75,10 +47,33 @@ def activity_analysis(json_path):
     print()
 
 
-def layouts_analysis(json_path):
-    print()
+def collect_GUIs(json_file_path, results_file_path, GUI_type='View'):
+    with open(json_file_path, 'r', encoding='utf8') as f, open(results_file_path, 'a', encoding='utf-8') as result_f:
+        data = json.load(f)
+        # print(data['views'].decode('utf-8'))
+        views = data['views']
+        tag = data['tag']
+        state_str = data['state_str']
+        foreground_activity = data['foreground_activity']
+        lines = set()
+        for view in views:
+            size = view['size']
+            class_type = view['class']
+            if class_type == None:
+                continue
+            if GUI_type not in class_type:
+                continue
+            bounds = view['bounds']
+            line = class_type + spacer + size + spacer + str(bounds) + '\n'
+            lines.add(line)
 
-def traverse_collect_views(path, results_dir):
+        for s in lines:
+            result_f.write(s)
+
+
+def traverse_collect_GUIs(path, results_dir, GUI_type = 'View'):
+    if not os.path.exists(results_dir):
+        os.mkdir(results_dir)
     for root, dirs, files in os.walk(path):
         for dir in dirs:
             an_states = os.path.join(root, dir, dir + '.apk', 'states')
@@ -92,7 +87,7 @@ def traverse_collect_views(path, results_dir):
                     os.mkdir(an_results_dir)
                 an_results_file_path = os.path.join(an_results_dir, dir+'.txt')
                 for an_json_file in an_json_files:
-                    collect_views(an_json_file, an_results_file_path)
+                    collect_GUIs(an_json_file, an_results_file_path, GUI_type=GUI_type)
 
             tv_json_files = traverse_snapshots_json(tv_states)
             if tv_json_files != None:
@@ -102,7 +97,7 @@ def traverse_collect_views(path, results_dir):
                     os.mkdir(tv_results_dir)
                 tv_results_file_path = os.path.join(tv_results_dir, 'tv_'+dir+'.txt')
                 for tv_json_file in tv_json_files:
-                    collect_views(tv_json_file, tv_results_file_path)
+                    collect_GUIs(tv_json_file, tv_results_file_path, GUI_type=GUI_type)
 
 
 def traverse_snapshots_json(dir):
@@ -121,12 +116,13 @@ def traverse_snapshots_json(dir):
     return json_files
 
 
-
 if __name__ == '__main__':
-    # traverse_collect_views('results\selected_apps\\1', results_dir=results_dir)
-    #
-    # traverse_collect_views('results\selected_apps\\2', results_dir=results_dir)
-    #
-    # traverse_collect_views('results\selected_apps\\3', results_dir=results_dir)
+    traverse_collect_GUIs('results\high_similarity_apps', results_dir=results_dir, GUI_type='Layout')
+    traverse_collect_GUIs('results\selected_apps\\1', results_dir=results_dir, GUI_type='Layout')
+    traverse_collect_GUIs('results\selected_apps\\2', results_dir=results_dir, GUI_type='Layout')
+    traverse_collect_GUIs('results\selected_apps\\3', results_dir=results_dir, GUI_type='Layout')
 
-    analyze_views(results_dir)
+    analyze_GUIs(results_dir)
+
+    # collect_views('test_results\\2020-11-16_135351+2020-11-16_134217\state_2020-11-16_134217.json', 'test_results\\2020-11-16_135351+2020-11-16_134217\\tv.txt')
+    # collect_views('test_results\\2020-11-16_135351+2020-11-16_134217\state_2020-11-16_135351.json', 'test_results\\2020-11-16_135351+2020-11-16_134217\\android.txt')

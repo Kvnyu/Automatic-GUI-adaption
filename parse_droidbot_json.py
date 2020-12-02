@@ -126,7 +126,7 @@ def find_corresponding_snapshot(android_json_path, tv_json_path, root_dir, an_di
     else:
         return False
 
-def traverse_snopshot(an_dir, tv_dir, root_dir):
+def traverse_snapshots(an_dir, tv_dir, root_dir):
     print('traverse: '+root_dir)
     an_json_files = []
     tv_json_files = []
@@ -159,7 +159,7 @@ def traverse_all_dataset(path):
                 #print('valid')
                 an_states = os.path.join(root, dir, dir+'.apk', 'states')
                 tv_states = os.path.join(root, dir, 'tv_'+dir+'.apk', 'states')
-                traverse_snopshot(an_states, tv_states, os.path.join(root, dir))
+                traverse_snapshots(an_states, tv_states, os.path.join(root, dir))
             else:
                 continue
 

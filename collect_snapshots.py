@@ -1,15 +1,18 @@
 import os
 import shutil
 
-def copy_snapshot_json(name, dst, dir):
+def copy_snapshot_json(name, dst, src, new_name=None):
     if not os.path.exists(dst):
         os.makedirs(dst)
 
-    for root, dirs, files in os.walk(dir, topdown=False):
+    for root, dirs, files in os.walk(src, topdown=False):
         for file in files:
             if name in file:
                 #print('copy file'+file)
-                shutil.copy(os.path.join(dir, file), os.path.join(dst, file))
+                if new_name != None:
+                    shutil.copy(os.path.join(src, file), os.path.join(dst, new_name + "_" + file))
+                else:
+                    shutil.copy(os.path.join(src, file), os.path.join(dst, file))
 
 
 def check_main_activity(activity_name):
@@ -35,3 +38,4 @@ def check_an_tv_result(path):
     if count >= 2:
         status = True
     return status
+

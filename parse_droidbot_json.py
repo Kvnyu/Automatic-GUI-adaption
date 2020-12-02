@@ -4,6 +4,7 @@ import os
 import shutil
 from matplotlib.pyplot import MultipleLocator
 from collect_snapshots import copy_snapshot_json, check_main_activity, check_an_tv_result
+empirical_study_dir = 'results\empirical_study\pairs'
 
 def parse_droidbot_json(json_file_path):
     #print('parse begin...')
@@ -123,6 +124,13 @@ def find_corresponding_snapshot(android_json_path, tv_json_path, root_dir, an_di
         dst = os.path.join(root_dir, 'coresponding_snapshots_dir', an_name + '+' +tv_name)
         copy_snapshot_json(an_name, dst, an_dir)
         copy_snapshot_json(tv_name, dst, tv_dir)
+
+        #collect corresponding snapshots
+        an_dst_corresponding_snapshots = os.path.join(empirical_study_dir, 'android')
+        tv_dst_corresponding_snapshots = os.path.join(empirical_study_dir, 'tv')
+        copy_snapshot_json(an_name, an_dst_corresponding_snapshots, an_dir, new_name=an_name+'_'+tv_name)
+        copy_snapshot_json(tv_name, tv_dst_corresponding_snapshots, tv_dir, new_name=an_name+'_'+tv_name)
+
     else:
         return False
 
@@ -180,5 +188,5 @@ if __name__=='__main__':
     traverse_all_dataset('results\selected_apps\\1')
     traverse_all_dataset('results\selected_apps\\2')
     traverse_all_dataset('results\selected_apps\\3')
-
+    traverse_all_dataset('results\high_similarity_apps')
     #traverse_all_dataset('selected_apps')

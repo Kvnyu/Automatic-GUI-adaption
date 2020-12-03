@@ -1,0 +1,8 @@
+android.widget.LinearLayout     |||     27322     |||     0.36626628773660785
+android.widget.RelativeLayout     |||     26475     |||     0.35491179151697144
+android.widget.FrameLayout     |||     19621     |||     0.2630301892862888
+android.widget.GridLayout     |||     759     |||     0.010174808300713175
+androidx.drawerlayout.widget.DrawerLayout     |||     177     |||     0.0023727813823797524
+androidx.appcompat.widget.LinearLayoutCompat     |||     176     |||     0.0023593758378465334
+android.support.v4.widget.DrawerLayout     |||     60     |||     0.0008043326719931363
+android.widget.TableLayout     |||     6     |||     8.043326719931364e-05

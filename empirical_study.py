@@ -130,7 +130,7 @@ def traverse_corresponding_GUIs(corresponding_GUIs_dir, results_dir, GUI_type):
         an_results_dir = os.path.join(results_dir, 'android')
         if not os.path.exists(an_results_dir):
             os.mkdir(an_results_dir)
-        an_results_file_path = os.path.join(an_results_dir, dir + '.txt')
+        an_results_file_path = os.path.join(an_results_dir, 'android_total.txt')
         for an_json_file in an_json_files:
             collect_GUIs(an_json_file, an_results_file_path, GUI_type=GUI_type)
 
@@ -140,7 +140,7 @@ def traverse_corresponding_GUIs(corresponding_GUIs_dir, results_dir, GUI_type):
         tv_results_dir = os.path.join(results_dir, 'tv')
         if not os.path.exists(tv_results_dir):
             os.mkdir(tv_results_dir)
-        tv_results_file_path = os.path.join(tv_results_dir, 'tv_' + dir + '.txt')
+        tv_results_file_path = os.path.join(tv_results_dir, 'tv_total.txt')
         for tv_json_file in tv_json_files:
             collect_GUIs(tv_json_file, tv_results_file_path, GUI_type=GUI_type)
 
@@ -153,8 +153,11 @@ if __name__ == '__main__':
     #
     # analyze_GUIs(results_dir)
 
-    traverse_corresponding_GUIs(corresponding_GUIs_dir, corresponding_GUIs_dir+'\\results', GUI_type='View')
-    traverse_corresponding_GUIs(corresponding_GUIs_dir, corresponding_GUIs_dir + '\\results', GUI_type='Layout')
+    # traverse_corresponding_GUIs(corresponding_GUIs_dir, corresponding_GUIs_dir+'\\results\\View', GUI_type='View')
+    # traverse_corresponding_GUIs(corresponding_GUIs_dir, corresponding_GUIs_dir + '\\results\\Layout', GUI_type='Layout')
 
     # collect_views('test_results\\2020-11-16_135351+2020-11-16_134217\state_2020-11-16_134217.json', 'test_results\\2020-11-16_135351+2020-11-16_134217\\tv.txt')
     # collect_views('test_results\\2020-11-16_135351+2020-11-16_134217\state_2020-11-16_135351.json', 'test_results\\2020-11-16_135351+2020-11-16_134217\\android.txt')
+
+    analyze_GUIs('results\empirical_study\pairs\\results\Layout')
+    analyze_GUIs('results\empirical_study\pairs\\results\View')

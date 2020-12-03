@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import os
 import shutil
 from matplotlib.pyplot import MultipleLocator
-from collect_snapshots import copy_snapshot_json, check_main_activity, check_an_tv_result
-empirical_study_dir = 'results\empirical_study\pairs'
+from GUI_collection.collect_snapshots import copy_snapshot_json, check_main_activity, check_an_tv_result
+empirical_study_dir = 'preprocessed_data\empirical_study\pairs'
 
 def parse_droidbot_json(json_file_path):
     #print('parse begin...')
@@ -185,8 +185,8 @@ if __name__=='__main__':
 
     #traverse_snopshot('results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states', 'results\\apks\\1\\aqiyi')
 
-    traverse_all_dataset('results\selected_apps\\1')
-    traverse_all_dataset('results\selected_apps\\2')
-    traverse_all_dataset('results\selected_apps\\3')
-    traverse_all_dataset('results\high_similarity_apps')
+    traverse_all_dataset('preprocessed_data\selected_apps\\1')
+    traverse_all_dataset('preprocessed_data\selected_apps\\2')
+    traverse_all_dataset('preprocessed_data\selected_apps\\3')
+    traverse_all_dataset('preprocessed_data\high_similarity_apps')
     #traverse_all_dataset('selected_apps')

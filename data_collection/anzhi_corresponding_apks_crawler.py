@@ -2,7 +2,7 @@ import json
 import requests
 import os
 import difflib
-from  apk_crawler import store_path
+from  data_collection.apk_crawler import store_path
 
 spacer = '     |||     '
 min_apk_size = 100*1024

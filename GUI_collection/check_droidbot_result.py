@@ -31,4 +31,4 @@ def check_results(result_path, apk_path):
 
 
 if __name__=='__main__':
-    check_results('results\high_similarity_apps', 'high_similarity_apps')
+    check_results('preprocced_data\high_similarity_apps', 'high_similarity_apps')

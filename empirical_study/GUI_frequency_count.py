@@ -1,11 +1,39 @@
 import os
 import json
 spacer = '     |||     '
-results_dir = 'results\empirical_study\\Layout'
+results_dir = 'preprocessed_data\empirical_study\\Layout'
+corresponding_GUIs_dir = 'preprocessed_data\empirical_study\pairs'
 
-corresponding_GUIs_dir = 'results\empirical_study\pairs'
+def parse_views(view, GUI_type='TextView'):
+    class_type = view['class']
+    if class_type == None:
+        return None
+    if GUI_type not in class_type:
+        return None
+    if 'TextView' in class_type:
+        size = view['size']
+        bounds = view['bounds']
+        text = view['text']
+        if text == None:
+            text = 'None'
+        #text = text.encode('gbk', 'ignore').decode('gbk')
+        text = text.replace('\n', '')
+        features = class_type + spacer + size + spacer + str(bounds) + spacer + text + '\n'
+        return features
+    if 'ImageView' in class_type:
+        size = view['size']
+        bounds = view['bounds']
+        content_free_signature = view['content_free_signature']
+        features = class_type + spacer + size + spacer + str(bounds) + spacer + content_free_signature + '\n'
+        return features
+    else:
+        size = view['size']
+        bounds = view['bounds']
+        features = class_type  + spacer + size + spacer + str(bounds) + '\n'
+        return features
 
 def analyze_GUIs(results_dir):
+    print('analyze '+ results_dir)
     android_results_path = os.path.join(results_dir, 'android')
     tv_results_path = os.path.join(results_dir, 'tv')
 
@@ -21,7 +49,7 @@ def frequency_count(path, save_path):
     for root, dirs, files in os.walk(path):
         for file in files:
             file_path = os.path.join(root, file)
-            with open(file_path) as an_f:
+            with open(file_path, encoding='utf8') as an_f:
                 for line in an_f.readlines():
                     view = line.split(spacer)[0]
                     if dict.__contains__(view):
@@ -58,15 +86,9 @@ def collect_GUIs(json_file_path, results_file_path, GUI_type='View'):
         foreground_activity = data['foreground_activity']
         lines = set()
         for view in views:
-            size = view['size']
-            class_type = view['class']
-            if class_type == None:
-                continue
-            if GUI_type not in class_type:
-                continue
-            bounds = view['bounds']
-            line = class_type + spacer + size + spacer + str(bounds) + '\n'
-            lines.add(line)
+            line = parse_views(view, GUI_type)
+            if line != None:
+                lines.add(line)
 
         for s in lines:
             result_f.write(s)
@@ -146,18 +168,18 @@ def traverse_corresponding_GUIs(corresponding_GUIs_dir, results_dir, GUI_type):
 
 
 if __name__ == '__main__':
-    # traverse_collect_GUIs('results\high_similarity_apps', results_dir=results_dir, GUI_type='Layout')
-    # traverse_collect_GUIs('results\selected_apps\\1', results_dir=results_dir, GUI_type='Layout')
-    # traverse_collect_GUIs('results\selected_apps\\2', results_dir=results_dir, GUI_type='Layout')
-    # traverse_collect_GUIs('results\selected_apps\\3', results_dir=results_dir, GUI_type='Layout')
+    # traverse_collect_GUIs('preprocessed_data\high_similarity_apps', results_dir=results_dir, GUI_type='Layout')
+    # traverse_collect_GUIs('preprocessed_data\selected_apps\\1', results_dir=results_dir, GUI_type='Layout')
+    # traverse_collect_GUIs('preprocessed_data\selected_apps\\2', results_dir=results_dir, GUI_type='Layout')
+    # traverse_collect_GUIs('preprocessed_data\selected_apps\\3', results_dir=results_dir, GUI_type='Layout')
     #
     # analyze_GUIs(results_dir)
 
-    # traverse_corresponding_GUIs(corresponding_GUIs_dir, corresponding_GUIs_dir+'\\results\\View', GUI_type='View')
-    # traverse_corresponding_GUIs(corresponding_GUIs_dir, corresponding_GUIs_dir + '\\results\\Layout', GUI_type='Layout')
+    traverse_corresponding_GUIs(corresponding_GUIs_dir, corresponding_GUIs_dir+'\\results\\View', GUI_type='View')
+    traverse_corresponding_GUIs(corresponding_GUIs_dir, corresponding_GUIs_dir + '\\results\\Layout', GUI_type='Layout')
 
     # collect_views('test_results\\2020-11-16_135351+2020-11-16_134217\state_2020-11-16_134217.json', 'test_results\\2020-11-16_135351+2020-11-16_134217\\tv.txt')
     # collect_views('test_results\\2020-11-16_135351+2020-11-16_134217\state_2020-11-16_135351.json', 'test_results\\2020-11-16_135351+2020-11-16_134217\\android.txt')
 
-    analyze_GUIs('results\empirical_study\pairs\\results\Layout')
-    analyze_GUIs('results\empirical_study\pairs\\results\View')
+    analyze_GUIs('preprocessed_data\empirical_study\pairs\\results\Layout')
+    analyze_GUIs('preprocessed_data\empirical_study\pairs\\results\View')

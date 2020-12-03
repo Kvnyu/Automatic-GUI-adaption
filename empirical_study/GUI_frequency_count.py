@@ -4,32 +4,31 @@ spacer = '     |||     '
 results_dir = 'preprocessed_data\empirical_study\\Layout'
 corresponding_GUIs_dir = 'preprocessed_data\empirical_study\pairs'
 
-def parse_views(view, GUI_type='TextView'):
+def parse_view(view, GUI_type):
     class_type = view['class']
     if class_type == None:
         return None
     if GUI_type not in class_type:
         return None
+
+    size = view['size']
+    bounds = view['bounds']
+    parent = view['parent']
+
     if 'TextView' in class_type:
-        size = view['size']
-        bounds = view['bounds']
         text = view['text']
         if text == None:
             text = 'None'
         #text = text.encode('gbk', 'ignore').decode('gbk')
         text = text.replace('\n', '')
-        features = class_type + spacer + size + spacer + str(bounds) + spacer + text + '\n'
+        features = class_type + spacer + size + spacer + str(bounds) + spacer + text + spacer + str(parent) + '\n'
         return features
     if 'ImageView' in class_type:
-        size = view['size']
-        bounds = view['bounds']
         content_free_signature = view['content_free_signature']
-        features = class_type + spacer + size + spacer + str(bounds) + spacer + content_free_signature + '\n'
+        features = class_type + spacer + size + spacer + str(bounds) + spacer + content_free_signature + spacer + str(parent) + '\n'
         return features
     else:
-        size = view['size']
-        bounds = view['bounds']
-        features = class_type  + spacer + size + spacer + str(bounds) + '\n'
+        features = class_type  + spacer + size + spacer + str(bounds)  + spacer + str(parent) + '\n'
         return features
 
 def analyze_GUIs(results_dir):
@@ -86,7 +85,7 @@ def collect_GUIs(json_file_path, results_file_path, GUI_type='View'):
         foreground_activity = data['foreground_activity']
         lines = set()
         for view in views:
-            line = parse_views(view, GUI_type)
+            line = parse_view(view, GUI_type)
             if line != None:
                 lines.add(line)
 

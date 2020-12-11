@@ -58,6 +58,10 @@ def parse_droidbot_json(json_file_path):
                         current_color = 'red'
 
             class_type = view['class']
+            is_view = False
+            #draw view
+            if class_type == 'android.view.View':
+                is_view = True
 
             if class_type == None:
                 continue
@@ -72,7 +76,7 @@ def parse_droidbot_json(json_file_path):
                 bounds[0],
                 bounds[1][0] - bounds[0][0],
                 bounds[1][1] - bounds[0][1],
-                fill=False,
+                fill=is_view,
                 edgecolor=current_color
             ))
             status_zero = False
@@ -157,9 +161,6 @@ def traverse_snapshots(an_dir, tv_dir, root_dir):
             find_corresponding_snapshot(an_json_file, tv_json_file, root_dir, an_dir, tv_dir)
 
 
-def split_views():
-    print()
-
 def traverse_all_dataset(path):
     for root, dirs, files in os.walk(path):
         for dir in dirs:
@@ -177,7 +178,9 @@ if __name__=='__main__':
     #json_path = 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\state_2020-11-16_103409.json'
     #json_path = 'results\\apks\\1\\aqiyi\iqiyi_20236.apk\state_2020-11-16_102435.json'
     #tv_bounds, tv_texts, _ = parse_droidbot_json(json_path)
-    # _, android_texts = parse_droidbot_json(android_json_file_path)
+    parse_droidbot_json('D:\projects\crawler-huawei\preprocessed_data\\500_pairs\\state_2020-11-16_134304.json')
+    parse_droidbot_json('D:\projects\crawler-huawei\preprocessed_data\\500_pairs\\state_2020-11-16_135237.json')
+
     # print(check_similarity(tv_texts, android_texts))
 
     # find_corresponding_snapshot(android_json_file_path, tv_json_file_path, 'results\\apks\\1\\aqiyi',
@@ -185,8 +188,8 @@ if __name__=='__main__':
 
     #traverse_snopshot('results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states', 'results\\apks\\1\\aqiyi')
 
-    traverse_all_dataset('preprocessed_data\selected_apps\\1')
-    traverse_all_dataset('preprocessed_data\selected_apps\\2')
-    traverse_all_dataset('preprocessed_data\selected_apps\\3')
-    traverse_all_dataset('preprocessed_data\high_similarity_apps')
+    # traverse_all_dataset('preprocessed_data\selected_apps\\1')
+    # traverse_all_dataset('preprocessed_data\selected_apps\\2')
+    # traverse_all_dataset('preprocessed_data\selected_apps\\3')
+    # traverse_all_dataset('preprocessed_data\high_similarity_apps')
     #traverse_all_dataset('selected_apps')

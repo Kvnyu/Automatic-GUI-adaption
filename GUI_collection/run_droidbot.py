@@ -1,8 +1,8 @@
 import os
 
 #apks/category/app name directory/andorid.apk + tv.apk. Example: test_apks/video_player/Youtube/youtube.apk + tv_youtube.tv
-h_apps_dir = 'test_apks'
-save_dir = 'test_results'
+h_apps_dir = '..\preprocessed_data\selected_huawei\\apps'
+save_dir = '..\huawei_results'
 
 def cmd_evoker(path):
     for root, dirs, files in os.walk(path, topdown=True):
@@ -18,7 +18,7 @@ def cmd_evoker(path):
             apk_path = os.path.join(root, file_path)
             print(apk_path)
             cmd_instructions.append('-a '+apk_path+' ')
-            save_path_dir = os.path.join(save_dir, root)
+            save_path_dir = os.path.join(save_dir, root[root.rindex('\\')+1:])
             if not os.path.exists(save_path_dir):
                 os.makedirs(save_path_dir)
             save_path = os.path.join(save_path_dir, file_path)

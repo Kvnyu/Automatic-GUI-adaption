@@ -1,22 +1,19 @@
-import json
+#coding: utf-8
 import requests
 import os
-from url_crawler import url_save_path
 
-store_path = './tv_apks/'
+store_path = '..\preprocessed_data\selected_huawei\\apps\\'
 prefix_apk = 'tv_'
 
-def crawl_apk():
+def crawl_apk(url_path):
     # Open anzhi_url file
-    file = open(url_save_path)
-
+    file = open(url_path, encoding='utf-8')
     data = file.readlines()
-
     count = 0
-
     for i in data:
+        # i: 腾讯视频TV http://down.znds.com/getdownurl/?s=L2Rvd24vMjAyMDEwMjgvdHhzcDE2MTU4XzYuMi4wLjEwMDdfZGFuZ2JlaS5hcGs=
         line = i.split(" ")
-        #apk name like: Tone it up, I cast
+        #apk name like: 'Tone it up', 'I cast'
         if len(line) > 2:
             apk_name = " ".join(line[:-1])
         else:
@@ -69,4 +66,4 @@ def crawl_apk():
     file.close()
 
 if __name__ == '__main__':
-    crawl_apk()
+    crawl_apk('..\preprocessed_data\selected_huawei\\tv_urls.txt')

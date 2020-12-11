@@ -1,3 +1,4 @@
+#coding = utf-8
 import json
 import requests
 import os
@@ -6,14 +7,14 @@ from  data_collection.apk_crawler import store_path
 
 spacer = '     |||     '
 min_apk_size = 100*1024
-tv_corresponding_app_path = './tv_corresponding_apps.txt'
-tv_dic = open('./tv_dic.txt', encoding='gbk').readlines()
-tv_corresponding_apps = open(tv_corresponding_app_path, 'a+', encoding='gbk')
+tv_corresponding_app_path = '..\preprocessed_data\selected_huawei\\apps\\android_tv_apps.txt'
+tv_dic = open('..\preprocessed_data\selected_huawei\\android_dic.txt', encoding='utf-8').readlines()
+tv_corresponding_apps = open(tv_corresponding_app_path, 'a+', encoding='utf-8')
 
-def download(file_path):
+def traverse(file_path):
     # returns JSON object as
     # a dictionary
-    file = open(file_path, encoding='gbk')
+    file = open(file_path, encoding='utf-8')
     data = json.load(file)
     count = 0
 
@@ -23,16 +24,19 @@ def download(file_path):
         apk_name = apk_name.replace('<b>', '')
         apk_name = apk_name.replace('</b>', '')
 
-        tv_app = check_tv_dic(apk_name, tv_dic)
+        tv_app = check_android_dic(apk_name, tv_dic)
 
-        apk_name = apk_name.encode('gbk', 'ignore').decode('gbk')
+        #apk_name = apk_name.encode('gbk', 'ignore').decode('gbk')
 
-        if tv_app == 0:
-            print(apk_name+": no corresponding tv app")
-            continue
-        else:
-            tv_app = tv_app.encode('gbk', 'ignore').decode('gbk')
-            print('find corresponding tv app:' + tv_app + " and "+ apk_name)
+        try:
+            if tv_app == 0:
+                #print(apk_name+": no corresponding tv app")
+                continue
+            else:
+                #tv_app = tv_app.encode('gbk', 'ignore').decode('gbk')
+                print('find corresponding tv app:' + tv_app + " and "+ apk_name)
+        except UnicodeError as e:
+            print('UnicodeEncodeError...')
 
         download_link = i['download']
         download_dir = store_path + tv_app
@@ -40,7 +44,7 @@ def download(file_path):
         if not os.path.exists(download_dir):
             os.makedirs(download_dir)
 
-        apk_path = download_dir + '/' + apk_name + '.apk'
+        apk_path = os.path.join(download_dir, tv_app + '.apk')
 
         tv_corresponding_apps.write(tv_app + spacer + apk_name + spacer + download_dir + '\n')
 
@@ -78,12 +82,22 @@ def download(file_path):
 
     file.close()
 
-def check_tv_dic(app_name, tv_dic):
+
+def check_dic(app_name, tv_dic):
     similarity = 0
     for line in tv_dic:
         line = line[:-1]
         similarity = difflib.SequenceMatcher(None, app_name, line).quick_ratio()
-        if similarity > 0.6:
+        if similarity > 0.8:
+            return line
+
+    return 0
+
+
+def check_android_dic(app_name, tv_dic):
+    for line in tv_dic:
+        line = line[:-1]
+        if app_name in line:
             return line
 
     return 0
@@ -91,9 +105,9 @@ def check_tv_dic(app_name, tv_dic):
 
 if __name__=='__main__':
     #Opening JSON file
-    for root, dirs, files in os.walk("./anzhi_url", topdown=False):
+    for root, dirs, files in os.walk("..\preprocessed_data\\anzhi_url", topdown=False):
         for file_path in files:
-            download(root+'/'+file_path)
+            traverse(os.path.join(root, file_path))
 
     # Closing file
     print('total coressponding apks:'+str(len(tv_corresponding_apps.readlines())))

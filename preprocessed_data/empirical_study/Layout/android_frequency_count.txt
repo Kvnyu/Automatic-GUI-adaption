@@ -1,0 +1,9 @@
+android.widget.FrameLayout     |||     31895     |||     0.4063471436579524
+android.widget.RelativeLayout     |||     23769     |||     0.3028206696223819
+android.widget.LinearLayout     |||     22731     |||     0.2895963919889925
+androidx.appcompat.widget.LinearLayoutCompat     |||     50     |||     0.0006370075931305101
+android.support.v7.widget.LinearLayoutCompat     |||     18     |||     0.00022932273352698363
+androidx.drawerlayout.widget.DrawerLayout     |||     11     |||     0.00014014167048871223
+android.widget.TableLayout     |||     10     |||     0.00012740151862610202
+android.support.v4.widget.DrawerLayout     |||     5     |||     6.370075931305101e-05
+com.suning.mobile.ebuy.search.custom.DrawerLayout     |||     3     |||     3.822045558783061e-05

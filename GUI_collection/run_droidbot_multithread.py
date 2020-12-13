@@ -6,9 +6,9 @@ input_path1 = 'high_similarity_apps/1'
 input_path2 = 'high_similarity_apps/2'
 input_path3 = 'high_similarity_apps/3'
 
-output_path1 = 'preprocessed_data'
-output_path2 = 'preprocessed_data'
-output_path3 = 'preprocessed_data'
+output_path1 = '..\preprocessed_data'
+output_path2 = '..\preprocessed_data'
+output_path3 = '..\preprocessed_data'
 
 emulator1 = 'emulator-5554'
 emulator2 = 'emulator-5556'

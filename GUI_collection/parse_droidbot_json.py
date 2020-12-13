@@ -4,7 +4,8 @@ import os
 import shutil
 from matplotlib.pyplot import MultipleLocator
 from GUI_collection.collect_snapshots import copy_snapshot_json, check_main_activity, check_an_tv_result
-empirical_study_dir = 'preprocessed_data\empirical_study\pairs'
+empirical_study_dir = '..\preprocessed_data\empirical_study\pairs'
+corresponding_root = os.path.join(empirical_study_dir, 'android-tv')
 
 def parse_droidbot_json(json_file_path):
     #print('parse begin...')
@@ -14,7 +15,6 @@ def parse_droidbot_json(json_file_path):
 
     with open(json_file_path, 'r', encoding='utf8') as f:
         data = json.load(f)
-        #print(data['views'].decode('utf-8'))
         views = data['views']
         tag = data['tag']
         state_str = data['state_str']
@@ -38,8 +38,10 @@ def parse_droidbot_json(json_file_path):
         current_color = 'red'
         status_zero = True
         for view in views:
+            class_type = view['class']
             text = view['text']
-            if text != None:
+            #if text != None and 'TextView' not in class_type and 'ImageView' not in class_type:
+            if text != None and len(text) <= 5:
                 texts.append(text)
 
             size = view['size'].split('*')
@@ -57,11 +59,10 @@ def parse_droidbot_json(json_file_path):
                     else:
                         current_color = 'red'
 
-            class_type = view['class']
             is_view = False
             #draw view
-            if class_type == 'android.view.View':
-                is_view = True
+            # if class_type == 'android.view.View':
+            #     is_view = True
 
             if class_type == None:
                 continue
@@ -76,7 +77,7 @@ def parse_droidbot_json(json_file_path):
                 bounds[0],
                 bounds[1][0] - bounds[0][0],
                 bounds[1][1] - bounds[0][1],
-                fill=is_view,
+                fill=False,
                 edgecolor=current_color
             ))
             status_zero = False
@@ -90,6 +91,7 @@ def parse_droidbot_json(json_file_path):
 
 def check_similarity(texts1, texts2):
     count = 0
+    operator = 5
     len1 = len(texts1)
     len2 = len(texts2)
     min_len = min(len1, len2)
@@ -102,11 +104,16 @@ def check_similarity(texts1, texts2):
         for text2 in texts2:
             if text2 in texts1:
                 count += 1
-    if count * 5 > min_len:
+
+    if min_len <= 5:
+        operator = 3
+
+    if count * operator > min_len:
         print('the same texts: ' + str(count))
         return True
     else:
         return False
+
 
 def find_corresponding_snapshot(android_json_path, tv_json_path, root_dir, an_dir, tv_dir):
     tv_bounds, tv_texts, an_is_main = parse_droidbot_json(tv_json_path)
@@ -115,28 +122,27 @@ def find_corresponding_snapshot(android_json_path, tv_json_path, root_dir, an_di
     an_name = ((android_json_path.split('\\')[-1]).split('.')[0])[6:]
     tv_name = ((tv_json_path.split('\\')[-1]).split('.')[0])[6:]
 
-    if an_is_main:
-        dst = os.path.join(root_dir, 'main_activity', 'android')
-        copy_snapshot_json(an_name, dst, an_dir)
-    if tv_is_main:
-        dst = os.path.join(root_dir, 'main_activity', 'tv')
-        copy_snapshot_json(tv_name, dst, tv_dir)
+    # if an_is_main:
+    #     dst = os.path.join(root_dir, 'main_activity', 'android')
+    #     copy_snapshot_json(an_name, dst, an_dir)
+    # if tv_is_main:
+    #     dst = os.path.join(root_dir, 'main_activity', 'tv')
+    #     copy_snapshot_json(tv_name, dst, tv_dir)
 
     status = check_similarity(tv_texts, android_texts)
     if status == True:
-        #copy_file(android_json_path, tv_json_path, root_dir, an_dir, tv_dir)
-        dst = os.path.join(root_dir, 'coresponding_snapshots_dir', an_name + '+' +tv_name)
-        copy_snapshot_json(an_name, dst, an_dir)
-        copy_snapshot_json(tv_name, dst, tv_dir)
+        # dst = os.path.join(root_dir, 'coresponding_snapshots_dir', an_name + '+' +tv_name)
+        # copy_snapshot_json(an_name, dst, an_dir)
+        # copy_snapshot_json(tv_name, dst, tv_dir)
 
         #collect corresponding snapshots
         an_dst_corresponding_snapshots = os.path.join(empirical_study_dir, 'android')
         tv_dst_corresponding_snapshots = os.path.join(empirical_study_dir, 'tv')
         copy_snapshot_json(an_name, an_dst_corresponding_snapshots, an_dir, new_name=an_name+'_'+tv_name)
         copy_snapshot_json(tv_name, tv_dst_corresponding_snapshots, tv_dir, new_name=an_name+'_'+tv_name)
-
     else:
         return False
+
 
 def traverse_snapshots(an_dir, tv_dir, root_dir):
     print('traverse: '+root_dir)
@@ -173,13 +179,12 @@ def traverse_all_dataset(path):
                 continue
 
 
-
 if __name__=='__main__':
     #json_path = 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\state_2020-11-16_103409.json'
     #json_path = 'results\\apks\\1\\aqiyi\iqiyi_20236.apk\state_2020-11-16_102435.json'
     #tv_bounds, tv_texts, _ = parse_droidbot_json(json_path)
-    parse_droidbot_json('D:\projects\crawler-huawei\preprocessed_data\\500_pairs\\state_2020-11-16_134304.json')
-    parse_droidbot_json('D:\projects\crawler-huawei\preprocessed_data\\500_pairs\\state_2020-11-16_135237.json')
+    # parse_droidbot_json('D:\projects\crawler-huawei\preprocessed_data\\test_data\\state_2020-11-16_134304.json')
+    # parse_droidbot_json('D:\projects\crawler-huawei\preprocessed_data\\test_data\\state_2020-11-16_135237.json')
 
     # print(check_similarity(tv_texts, android_texts))
 
@@ -188,8 +193,9 @@ if __name__=='__main__':
 
     #traverse_snopshot('results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states', 'results\\apks\\1\\aqiyi')
 
-    # traverse_all_dataset('preprocessed_data\selected_apps\\1')
-    # traverse_all_dataset('preprocessed_data\selected_apps\\2')
-    # traverse_all_dataset('preprocessed_data\selected_apps\\3')
-    # traverse_all_dataset('preprocessed_data\high_similarity_apps')
-    #traverse_all_dataset('selected_apps')
+    traverse_all_dataset('..\preprocessed_data\selected_apps\\1')
+    traverse_all_dataset('..\preprocessed_data\selected_apps\\2')
+    traverse_all_dataset('..\preprocessed_data\selected_apps\\3')
+    traverse_all_dataset('..\preprocessed_data\high_similarity_apps')
+    traverse_all_dataset('..\selected_apps')
+    traverse_all_dataset('..\huawei_results')

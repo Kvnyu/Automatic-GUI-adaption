@@ -6,7 +6,7 @@ import difflib
 import matplotlib.pyplot as plt
 from empirical_study.utils import parse_view, get_GUIs_from_json, trace_layout, draw_GUI_skeleton
 from empirical_study.utils import spacer
-
+from GUI_collection.collect_snapshots import copy_snapshot_json_skeleton
 
 android_dir = '..\preprocessed_data\empirical_study\pairs\\android'
 tv_dir = '..\preprocessed_data\empirical_study\pairs\\tv'
@@ -49,10 +49,11 @@ def find_corresponding_GUI_pairs(android_dir, tv_dir, resluts_dir):
                 an_json_path = os.path.join(android_dir, an_json)
                 tv_json_path = os.path.join(tv_dir, tv_json)
                 an_json_dst = os.path.join(pairs_dir, an_json)
-                shutil.copy(an_json_path, an_json_dst)
+                copy_snapshot_json_skeleton(an_json.split('.')[0], pairs_dir, android_dir)
+                #shutil.copy(an_json_path, an_json_dst)
                 tv_json_dst = os.path.join(pairs_dir, tv_json)
-                shutil.copy(tv_json_path, tv_json_dst)
-
+                #shutil.copy(tv_json_path, tv_json_dst)
+                copy_snapshot_json_skeleton(tv_json.split('.')[0], pairs_dir, tv_dir, new_name='tv_')
 
                 # find corresponding GUI pairs
                 an_views_lines, an_views = get_GUIs_from_json(an_json_path, GUI_type='View')

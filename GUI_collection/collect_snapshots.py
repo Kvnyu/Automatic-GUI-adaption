@@ -15,6 +15,21 @@ def copy_snapshot_json(name, dst, src, new_name=None):
                     shutil.copy(os.path.join(src, file), os.path.join(dst, file))
 
 
+def copy_snapshot_json_skeleton(name, dst, src, new_name=None):
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+
+    for root, dirs, files in os.walk(src, topdown=False):
+        for file in files:
+            if 'screen' in file:
+                file_new = file.replace('screen', 'state')
+            if name in file_new:
+                #print('copy file'+file)
+                if new_name != None:
+                    shutil.copy(os.path.join(src, file), os.path.join(dst, new_name + "_" + file))
+                else:
+                    shutil.copy(os.path.join(src, file), os.path.join(dst, file))
+
 def check_main_activity(activity_name):
     dic = ['home', 'Home', 'Main', 'main', 'Welcome', 'welcome']
     for word in dic:

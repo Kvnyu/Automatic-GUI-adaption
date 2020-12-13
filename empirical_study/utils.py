@@ -43,6 +43,29 @@ def parse_view(view, GUI_type):
     return features
 
 
+def simple_parse_view(view):
+
+    class_type = view['class']
+    if class_type == None:
+        return None
+
+    size = view['size']
+    bounds = view['bounds']
+    parent = view['parent']
+    child_count = view ['child_count']
+    children = view['children']
+    if child_count == 0:
+        children = None
+
+    text = view['text']
+    if text == None:
+        text = 'None'
+    features = class_type + spacer + size + spacer + str(bounds) + spacer + str(parent) + spacer + str(child_count) + spacer + str(children) + spacer + text
+    features = features.replace('\n', '')
+    features = features + '\n'
+    return features
+
+
 def analyze_GUIs(results_dir):
     print('analyze '+ results_dir)
     android_results_path = os.path.join(results_dir, 'android')

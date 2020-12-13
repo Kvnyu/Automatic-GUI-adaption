@@ -1,9 +1,11 @@
 import os
 import json
+from empirical_study.utils import parse_view, analyze_GUIs
+
 
 results_dir = '..\preprocessed_data\empirical_study\\Layout'
 corresponding_GUIs_dir = '..\preprocessed_data\empirical_study\pairs'
-from empirical_study.utils import parse_view, analyze_GUIs
+
 
 def activity_analysis(json_path):
     print()

@@ -44,7 +44,6 @@ def parse_view(view, GUI_type):
 
 
 def simple_parse_view(view):
-
     class_type = view['class']
     if class_type == None:
         return None
@@ -114,7 +113,7 @@ def get_GUIs_from_json(json_file_path, GUI_type):
         tag = data['tag']
         state_str = data['state_str']
         foreground_activity = data['foreground_activity']
-        return views_parser(views, GUI_type)
+        return views_parser(views, GUI_type), tag
 
 
 def views_parser(views, GUI_type):

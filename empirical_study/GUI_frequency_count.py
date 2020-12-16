@@ -2,14 +2,7 @@ import os
 import json
 from empirical_study.utils import parse_view, analyze_GUIs
 
-
-results_dir = '..\preprocessed_data\empirical_study\\Layout'
 corresponding_GUIs_dir = '..\preprocessed_data\empirical_study\pairs'
-
-
-def activity_analysis(json_path):
-    print()
-
 
 def collect_GUIs(json_file_path, results_file_path, GUI_type='View'):
     with open(json_file_path, 'r', encoding='utf8') as f, open(results_file_path, 'a', encoding='utf-8') as result_f:
@@ -81,6 +74,7 @@ def traverse_corresponding_GUIs(corresponding_GUIs_dir, results_dir, GUI_type):
     an_dir = os.path.join(corresponding_GUIs_dir, 'android')
     tv_dir = os.path.join(corresponding_GUIs_dir, 'tv')
 
+    corresponding_snapshots_tags = []
     an_json_files = traverse_snapshots_json(an_dir)
     if an_json_files != None:
         # an_results_file_path = os.path.join(root, dir, dir+'.txt')
@@ -103,18 +97,14 @@ def traverse_corresponding_GUIs(corresponding_GUIs_dir, results_dir, GUI_type):
 
 
 if __name__ == '__main__':
-
-
     # collect_views('test_results\\2020-11-16_135351+2020-11-16_134217\state_2020-11-16_134217.json', 'test_results\\2020-11-16_135351+2020-11-16_134217\\tv.txt')
     # collect_views('test_results\\2020-11-16_135351+2020-11-16_134217\state_2020-11-16_135351.json', 'test_results\\2020-11-16_135351+2020-11-16_134217\\android.txt')
-
 
     # traverse_collect_GUIs('..\\preprocessed_data\high_similarity_apps', results_dir=results_dir, GUI_type='Layout')
     # traverse_collect_GUIs('..\\preprocessed_data\selected_apps\\1', results_dir=results_dir, GUI_type='Layout')
     # traverse_collect_GUIs('..\\preprocessed_data\selected_apps\\2', results_dir=results_dir, GUI_type='Layout')
     # traverse_collect_GUIs('..\\preprocessed_data\selected_apps\\3', results_dir=results_dir, GUI_type='Layout')
     # analyze_GUIs(results_dir)
-
 
     traverse_corresponding_GUIs(corresponding_GUIs_dir, corresponding_GUIs_dir+'\\results\\View', GUI_type='View')
     traverse_corresponding_GUIs(corresponding_GUIs_dir, corresponding_GUIs_dir + '\\results\\Layout', GUI_type='Layout')

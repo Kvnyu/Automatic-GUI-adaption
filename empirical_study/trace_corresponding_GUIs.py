@@ -35,6 +35,7 @@ def find_corresponding_GUI_pairs(android_dir, tv_dir, resluts_dir):
     corresponding_layouts_list = []
 
     # 2020-11-16_104643_2020-11-16_105627_screen_2020-11-16_104643, check 2020-11-16_104643_2020-11-16_105627
+    corresponding_snapshots_tags = []
     for an_json in an_json_files:
         for tv_json in tv_json_files:
             an_json_clips = an_json.split('_')
@@ -56,8 +57,14 @@ def find_corresponding_GUI_pairs(android_dir, tv_dir, resluts_dir):
                 copy_snapshot_json_skeleton(tv_json.split('.')[0], pairs_dir, tv_dir, new_name='tv_')
 
                 # find corresponding GUI pairs
-                an_views_lines, an_views = get_GUIs_from_json(an_json_path, GUI_type='View')
-                tv_views_lines, tv_views = get_GUIs_from_json(tv_json_path, GUI_type='View')
+                an_views_lines, an_views, an_tag = get_GUIs_from_json(an_json_path, GUI_type='View')
+                tv_views_lines, tv_views, tv_tag = get_GUIs_from_json(tv_json_path, GUI_type='View')
+
+                tag = an_tag + ' + ' +tv_tag
+                if not tag in corresponding_snapshots_tags:
+                    corresponding_snapshots_tags.append(tag)
+                else:
+                    continue
 
                 draw_an_views = []
                 draw_tv_views = []

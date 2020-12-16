@@ -1,10 +1,12 @@
 #coding: utf-8
 import xlrd
 spacer = ' '
+tv_dic_path = './tv_dic.txt'
+urls_path = './url_tv_apks_education.txt'
 
 def generate_tv_dic():
-    tv_dic = open('./tv_dic.txt', 'w', encoding='utf-8')
-    urls = open('./url_tv_apks_education.txt')
+    tv_dic = open(tv_dic_path, 'w', encoding='utf-8')
+    urls = open(urls_path)
     tv = ''
     for line in urls.readlines():
         line = line.split(" ")
@@ -32,7 +34,7 @@ def generate_tv_dic_from_list(list, dic_path):
     tv_dic.close()
 
 
-def read_excel(excel_path, dic_path, urls_path):
+def read_excel_huawei(excel_path, dic_path, urls_path):
     workbook = xlrd.open_workbook(excel_path)
     #print(workbook.sheet_names())
     sheet1 = workbook.sheet_by_name('Sheet1')
@@ -59,5 +61,6 @@ def read_excel(excel_path, dic_path, urls_path):
     tv_urls.close()
 
 if __name__ == '__main__':
-    read_excel('..\preprocessed_data\selected_huawei\Phone TV apk list.xlsx',
-               '..\preprocessed_data\selected_huawei\\android_dic.txt', '..\preprocessed_data\selected_huawei\\tv_urls.txt')
+    # read_excel('..\preprocessed_data\selected_huawei\Phone TV apk list.xlsx',
+    #            '..\preprocessed_data\selected_huawei\\android_dic.txt', '..\preprocessed_data\selected_huawei\\tv_urls.txt')
+    generate_tv_dic()

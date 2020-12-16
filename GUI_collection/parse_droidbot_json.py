@@ -86,7 +86,7 @@ def parse_droidbot_json(json_file_path):
     plt.savefig(json_file_path+'.png')
     fig.canvas.flush_events()
     plt.close()
-    return bounds_all, texts, is_main_activity
+    return bounds_all, texts, is_main_activity, tag
 
 
 def check_similarity(texts1, texts2):
@@ -115,19 +115,25 @@ def check_similarity(texts1, texts2):
         return False
 
 
-def find_corresponding_snapshot(android_json_path, tv_json_path, root_dir, an_dir, tv_dir):
-    tv_bounds, tv_texts, an_is_main = parse_droidbot_json(tv_json_path)
-    android_bounds, android_texts, tv_is_main = parse_droidbot_json(android_json_path)
+def find_corresponding_snapshot(android_json_path, tv_json_path, root_dir, an_dir, tv_dir, corresponding_snapshots_tags):
+    tv_bounds, tv_texts, tv_is_main, tv_tag = parse_droidbot_json(tv_json_path)
+    android_bounds, android_texts, android_is_main,  android_tag= parse_droidbot_json(android_json_path)
 
     an_name = ((android_json_path.split('\\')[-1]).split('.')[0])[6:]
     tv_name = ((tv_json_path.split('\\')[-1]).split('.')[0])[6:]
 
-    # if an_is_main:
+    # if android_is_main:
     #     dst = os.path.join(root_dir, 'main_activity', 'android')
     #     copy_snapshot_json(an_name, dst, an_dir)
     # if tv_is_main:
     #     dst = os.path.join(root_dir, 'main_activity', 'tv')
     #     copy_snapshot_json(tv_name, dst, tv_dir)
+
+    tag = android_tag + ' + ' + tv_tag
+    if not tag in corresponding_snapshots_tags:
+        corresponding_snapshots_tags.append(tag)
+    else:
+        return
 
     status = check_similarity(tv_texts, android_texts)
     if status == True:
@@ -144,7 +150,7 @@ def find_corresponding_snapshot(android_json_path, tv_json_path, root_dir, an_di
         return False
 
 
-def traverse_snapshots(an_dir, tv_dir, root_dir):
+def traverse_snapshots(an_dir, tv_dir, root_dir, corresponding_snapshots_tags):
     print('traverse: '+root_dir)
     an_json_files = []
     tv_json_files = []
@@ -164,17 +170,18 @@ def traverse_snapshots(an_dir, tv_dir, root_dir):
 
     for tv_json_file in tv_json_files:
         for an_json_file in an_json_files:
-            find_corresponding_snapshot(an_json_file, tv_json_file, root_dir, an_dir, tv_dir)
+            find_corresponding_snapshot(an_json_file, tv_json_file, root_dir, an_dir, tv_dir, corresponding_snapshots_tags)
 
 
 def traverse_all_dataset(path):
+    corresponding_snapshots_tags = []
     for root, dirs, files in os.walk(path):
         for dir in dirs:
             if check_an_tv_result(os.path.join(root, dir)):
                 #print('valid')
                 an_states = os.path.join(root, dir, dir+'.apk', 'states')
                 tv_states = os.path.join(root, dir, 'tv_'+dir+'.apk', 'states')
-                traverse_snapshots(an_states, tv_states, os.path.join(root, dir))
+                traverse_snapshots(an_states, tv_states, os.path.join(root, dir), corresponding_snapshots_tags)
             else:
                 continue
 
@@ -193,9 +200,9 @@ if __name__=='__main__':
 
     #traverse_snopshot('results\\apks\\1\\aqiyi\iqiyi_20236.apk\states', 'results\\apks\\1\\aqiyi\qiyiguo_official10.11.2.apk\states', 'results\\apks\\1\\aqiyi')
 
-    traverse_all_dataset('..\preprocessed_data\selected_apps\\1')
-    traverse_all_dataset('..\preprocessed_data\selected_apps\\2')
-    traverse_all_dataset('..\preprocessed_data\selected_apps\\3')
-    traverse_all_dataset('..\preprocessed_data\high_similarity_apps')
-    traverse_all_dataset('..\selected_apps')
+    # traverse_all_dataset('..\preprocessed_data\selected_apps\\1')
+    # traverse_all_dataset('..\preprocessed_data\selected_apps\\2')
+    # traverse_all_dataset('..\preprocessed_data\selected_apps\\3')
+    # traverse_all_dataset('..\preprocessed_data\high_similarity_apps')
+    # traverse_all_dataset('..\selected_apps')
     traverse_all_dataset('..\huawei_results')
